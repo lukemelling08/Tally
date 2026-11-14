@@ -4,6 +4,9 @@ import '@fontsource/jetbrains-mono/400.css'
 import '@fontsource/jetbrains-mono/700.css'
 import './index.css'
 import App from './App.tsx'
+import { initTheme } from './theme'
+
+initTheme()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

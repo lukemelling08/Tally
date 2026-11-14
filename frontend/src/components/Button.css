@@ -32,8 +32,8 @@
 }
 
 .button--primary {
-  background: var(--brown);
-  color: var(--cream);
+  background: var(--primary-bg);
+  color: var(--primary-text);
 }
 
 .button--inverse {

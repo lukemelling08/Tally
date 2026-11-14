@@ -1,0 +1,95 @@
+.settings {
+  max-width: 40rem;
+}
+
+.settings__title {
+  margin: 0;
+  padding: 1.5rem 0 1rem;
+  font-size: 1.4rem;
+}
+
+.settings-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.settings-group__legend {
+  padding: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+/* Options sit in one panel, separated by grey lines */
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top-width: 0;
+}
+
+.option:first-of-type {
+  border-top-width: 1px;
+  border-radius: 0.6rem 0.6rem 0 0;
+}
+
+.option:last-of-type {
+  border-radius: 0 0 0.6rem 0.6rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .option {
+    cursor: pointer;
+  }
+}
+
+.option input {
+  appearance: none;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  border: 2px solid var(--control-border);
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+}
+
+.option input::before {
+  content: '';
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--text);
+  transform: scale(0);
+}
+
+.option input:checked {
+  border-color: var(--text);
+}
+
+.option input:checked::before {
+  transform: scale(1);
+}
+
+.option__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.option__label {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.option__hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}

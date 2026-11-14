@@ -1,15 +1,9 @@
 .trip-card {
-  --status-colour: var(--divider);
-
   container-type: inline-size;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.75rem 0.9rem 0.6rem;
-  background: var(--paper);
-  border: 1px solid var(--line-grey);
-  border-left: 4px solid var(--status-colour);
-  border-radius: 0.6rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
 }
 
 /* Pointer cursor for mouse users only; touch screens get no hover styling */
@@ -19,12 +13,11 @@
   }
 }
 
-.trip-card--pending {
-  --status-colour: var(--pending);
-}
-
-.trip-card--expensed {
-  --status-colour: var(--approved);
+.trip-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 0.9rem;
 }
 
 /* Header text scales with the card's width so it stays on one line */
@@ -46,7 +39,7 @@
 
 .trip-card__dates {
   font-weight: 400;
-  color: var(--muted-brown);
+  color: var(--text-muted);
 }
 
 .trip-card__balance {
@@ -65,7 +58,7 @@
   padding: 0;
   list-style: none;
   font-size: 0.72rem;
-  border-top: 1px solid var(--line-grey);
+  border-top: 1px solid var(--line);
 }
 
 .transaction {
@@ -74,7 +67,7 @@
   grid-template-columns: subgrid;
   align-items: baseline;
   padding: 0.35rem 0.25rem;
-  border-bottom: 1px solid var(--line-grey);
+  border-bottom: 1px solid var(--line);
 }
 
 .transaction__company {
@@ -88,36 +81,31 @@
 }
 
 .transaction__time {
-  color: var(--muted-brown);
+  color: var(--text-muted);
 }
 
-.trip-card__footer {
+/* Full-width status band along the bottom of the card */
+.trip-card__status {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  font-size: 0.7rem;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  font-size: 0.8rem;
   font-weight: 700;
 }
 
-.status-badge svg {
-  width: 0.85rem;
-  height: 0.85rem;
+.trip-card__status svg {
+  width: 1rem;
+  height: 1rem;
 }
 
-.status-badge--pending {
+.trip-card__status--pending {
   background: var(--pending);
   color: var(--brown);
 }
 
-.status-badge--expensed {
+.trip-card__status--expensed {
   background: var(--approved);
   color: #fff;
 }
