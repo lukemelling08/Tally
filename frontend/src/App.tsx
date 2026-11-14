@@ -1,8 +1,18 @@
 import Button from './components/Button'
 import { PlusIcon, UserIcon } from './components/icons'
+import NewExpensePage from './pages/NewExpensePage'
 import SettingsPage from './pages/SettingsPage'
+import TripOverviewPage from './pages/TripOverviewPage'
 import TripsPage from './pages/TripsPage'
 import { navigate, scrollToTop, usePathname } from './router'
+
+function currentPage(pathname: string) {
+  if (pathname === '/settings') return <SettingsPage />
+  if (pathname === '/expenses/new') return <NewExpensePage />
+  const trip = pathname.match(/^\/trips\/([^/]+)$/)
+  if (trip) return <TripOverviewPage tripId={decodeURIComponent(trip[1])} />
+  return <TripsPage />
+}
 
 function App() {
   const pathname = usePathname()
@@ -31,12 +41,19 @@ function App() {
               aria-current={pathname === '/settings' ? 'page' : undefined}
               onClick={() => navigate('/settings')}
             />
-            <Button variant="inverse" icon={<PlusIcon />} aria-label="Add expense" />
+            <Button
+              variant="inverse"
+              icon={<PlusIcon />}
+              aria-label="Add expense"
+              aria-current={pathname === '/expenses/new' ? 'page' : undefined}
+              onClick={() => navigate('/expenses/new')}
+            />
           </div>
         </div>
       </header>
 
-      {pathname === '/settings' ? <SettingsPage /> : <TripsPage />}
+      {/* Keyed so each page starts fresh, e.g. a new blank expense form */}
+      <div key={pathname}>{currentPage(pathname)}</div>
     </>
   )
 }

@@ -26,9 +26,24 @@
   flex-shrink: 0;
 }
 
+.button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.button--small {
+  min-height: 2.25rem;
+  padding: 0 0.75rem;
+  font-size: 0.8rem;
+}
+
 .button--icon-only {
   width: 2.75rem;
   padding: 0;
+}
+
+.button--small.button--icon-only {
+  width: 2.25rem;
 }
 
 .button--primary {
@@ -45,6 +60,17 @@
   background: transparent;
   color: var(--cream);
   border-color: var(--cream);
+}
+
+.button--ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--control-border);
+}
+
+.button--danger {
+  background: var(--rejected);
+  color: #fff;
 }
 
 .button--accent {

@@ -4,6 +4,8 @@
   flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--line);
+  color: inherit;
+  text-decoration: none;
 }
 
 /* Pointer cursor for mouse users only; touch screens get no hover styling */

@@ -1,21 +1,25 @@
-import { totalGross, tripStatus, type Trip } from '../data/trips'
-import { formatDateRange, formatDateTime, formatGBP } from '../format'
+import { totalGross, tripStatus, type Expense, type Trip } from '../db'
+import { formatDateRange, formatDayMonth, formatGBP } from '../format'
+import { tripRoute } from '../places'
+import Link from './Link'
 import { CheckIcon, ClockIcon } from './icons'
 import './TripCard.css'
 
 const PREVIEW_COUNT = 4
 
-function TripCard({ trip }: { trip: Trip }) {
-  const preview = trip.transactions.slice(0, PREVIEW_COUNT)
-  const status = tripStatus(trip)
-  const headingId = `trip-${trip.id}`
+function TripCard({ trip, expenses }: { trip: Trip; expenses: Expense[] }) {
+  const preview = expenses.slice(0, PREVIEW_COUNT)
+  const status = tripStatus(expenses)
 
   return (
-    <article className="trip-card" aria-labelledby={headingId}>
+    <Link to={`/trips/${trip.id}`} className="trip-card">
       <div className="trip-card__body">
-        <header className="trip-card__header">
-          <h2 id={headingId} className="trip-card__route">
-            {trip.from} → {trip.to}
+        <div className="trip-card__header">
+          <h2 className="trip-card__route">
+            <span aria-hidden="true">{tripRoute(trip.from, trip.to)}</span>
+            <span className="visually-hidden">
+              {trip.from} to {trip.to}
+            </span>
             <span className="trip-card__dates">
               {' · '}
               {formatDateRange(trip.start, trip.end)}
@@ -23,28 +27,28 @@ function TripCard({ trip }: { trip: Trip }) {
           </h2>
           <p className="trip-card__balance">
             <span className="visually-hidden">Balance </span>
-            {formatGBP(totalGross(trip.transactions))}
+            {formatGBP(totalGross(expenses))}
           </p>
-        </header>
+        </div>
 
         <ul className="trip-card__transactions">
-          {preview.map((t) => (
-            <li key={t.id} className="transaction">
-              <span className="transaction__company">{t.company}</span>
-              <span className="transaction__amount">{formatGBP(t.gross)}</span>
-              <time className="transaction__time" dateTime={t.purchasedAt}>
-                {formatDateTime(t.purchasedAt)}
+          {preview.map((e) => (
+            <li key={e.id} className="transaction">
+              <span className="transaction__company">{e.company}</span>
+              <span className="transaction__amount">{formatGBP(e.gross)}</span>
+              <time className="transaction__time" dateTime={e.purchasedAt}>
+                {formatDayMonth(e.purchasedAt)}
               </time>
             </li>
           ))}
         </ul>
       </div>
 
-      <footer className={`trip-card__status trip-card__status--${status}`}>
+      <div className={`trip-card__status trip-card__status--${status}`}>
         {status === 'pending' ? <ClockIcon /> : <CheckIcon />}
         {status === 'pending' ? 'Pending' : 'Expensed'}
-      </footer>
-    </article>
+      </div>
+    </Link>
   )
 }
 

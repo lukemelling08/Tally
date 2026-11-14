@@ -1,26 +1,7 @@
-.settings {
-  max-width: 40rem;
-}
-
-.settings__title {
-  margin: 0;
-  padding: 1.5rem 0 1rem;
-  font-size: 1.4rem;
-}
-
 .settings-group {
-  margin: 0;
+  margin: 0 0 2rem;
   padding: 0;
   border: 0;
-}
-
-.settings-group__legend {
-  padding: 0 0 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
 }
 
 /* Options sit in one panel, separated by grey lines */
@@ -36,11 +17,6 @@
 
 .option:first-of-type {
   border-top-width: 1px;
-  border-radius: 0.6rem 0.6rem 0 0;
-}
-
-.option:last-of-type {
-  border-radius: 0 0 0.6rem 0.6rem;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -92,4 +68,54 @@
 .option__hint {
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+
+/* Allowance cards match the trip cards: flat, square, grey border */
+.allowance-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr));
+  gap: var(--gap);
+  margin: 0 0 var(--gap);
+  padding: 0;
+  list-style: none;
+}
+
+.allowance-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 3rem 0.75rem 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.allowance-card__name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.allowance-card__amount {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.allowance-card__delete {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+}
+
+.allowance-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+  padding: 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.allowance-form__submit {
+  grid-column: 1 / -1;
 }

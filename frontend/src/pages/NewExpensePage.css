@@ -1,0 +1,46 @@
+.expense-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+/* Legends don't take part in flex layout, so float it to sit inside the panel */
+.form-section > .section-label {
+  float: left;
+  width: 100%;
+  padding: 0;
+}
+
+.receipt-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.receipt-preview__image {
+  width: 4.5rem;
+  height: 4.5rem;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
+.receipt-preview__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.expense-form__submit {
+  width: 100%;
+}

@@ -44,6 +44,55 @@ export function ClockIcon() {
   )
 }
 
+export function TrashIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+    </svg>
+  )
+}
+
+export function CloseIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  )
+}
+
+export function CameraIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </svg>
+  )
+}
+
+export function ReceiptIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6" />
+    </svg>
+  )
+}
+
+export function WarningIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M12 3l10 18H2zM12 10v5M12 18v.5" />
+    </svg>
+  )
+}
+
+export function ShareIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M12 15V3M7 8l5-5 5 5M5 12v9h14v-9" />
+    </svg>
+  )
+}
+
 export function ArrowUpIcon() {
   return (
     <svg {...iconProps}>

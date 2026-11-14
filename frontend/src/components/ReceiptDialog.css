@@ -1,0 +1,50 @@
+.receipt-dialog {
+  width: calc(100% - 2rem);
+  max-width: 40rem;
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.receipt-dialog::backdrop {
+  background: rgb(0 0 0 / 0.6);
+}
+
+.receipt-dialog__panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.receipt-dialog__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.5rem 0.5rem 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.receipt-dialog__title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.receipt-dialog__image {
+  display: block;
+  width: 100%;
+  max-height: calc(100dvh - 6rem);
+  object-fit: contain;
+  background: var(--bg);
+}
+
+.receipt-dialog__empty {
+  margin: 0;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+}
