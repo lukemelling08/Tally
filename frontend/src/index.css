@@ -1,0 +1,83 @@
+:root {
+  --banner-height: 3.5rem;
+  --gap: 1rem;
+  --bg: #f3f4f6;
+  --banner-bg: #1f2937;
+  --banner-fg: #f9fafb;
+  --card-bg: #ffffff;
+  --card-border: #d1d5db;
+  --text: #111827;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Fixed to the top while everything below scrolls with the page */
+.top-banner {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--banner-height) + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 1rem 0;
+  background: var(--banner-bg);
+  color: var(--banner-fg);
+  text-align: center;
+}
+
+.top-banner p {
+  margin: 0;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.content {
+  width: 100%;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 0 1rem calc(var(--gap) + env(safe-area-inset-bottom));
+}
+
+.title {
+  margin: 0;
+  padding: 2.5rem 0;
+  text-align: center;
+  font-size: clamp(2rem, 8vw, 3rem);
+}
+
+.card-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+/* Sized so roughly three cards fill the space under the banner */
+.card {
+  height: calc((100dvh - var(--banner-height) - 4 * var(--gap)) / 3);
+  min-height: 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 0.75rem;
+  font-size: 1.1rem;
+}
