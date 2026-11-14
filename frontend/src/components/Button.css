@@ -1,0 +1,53 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Pointer cursor for mouse users only; touch screens get no hover styling */
+@media (hover: hover) and (pointer: fine) {
+  .button {
+    cursor: pointer;
+  }
+}
+
+.button svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
+.button--icon-only {
+  width: 2.75rem;
+  padding: 0;
+}
+
+.button--primary {
+  background: var(--brown);
+  color: var(--cream);
+}
+
+.button--inverse {
+  background: var(--cream);
+  color: var(--brown);
+}
+
+.button--ghost-inverse {
+  background: transparent;
+  color: var(--cream);
+  border-color: var(--cream);
+}
+
+.button--accent {
+  background: var(--accent);
+  color: #fff;
+}

@@ -1,0 +1,123 @@
+.trip-card {
+  --status-colour: var(--divider);
+
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 0.9rem 0.6rem;
+  background: var(--paper);
+  border: 1px solid var(--line-grey);
+  border-left: 4px solid var(--status-colour);
+  border-radius: 0.6rem;
+}
+
+/* Pointer cursor for mouse users only; touch screens get no hover styling */
+@media (hover: hover) and (pointer: fine) {
+  .trip-card {
+    cursor: pointer;
+  }
+}
+
+.trip-card--pending {
+  --status-colour: var(--pending);
+}
+
+.trip-card--expensed {
+  --status-colour: var(--approved);
+}
+
+/* Header text scales with the card's width so it stays on one line */
+.trip-card__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.trip-card__route {
+  margin: 0;
+  min-width: 0;
+  font-size: clamp(0.65rem, 4cqi, 0.9rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trip-card__dates {
+  font-weight: 400;
+  color: var(--muted-brown);
+}
+
+.trip-card__balance {
+  margin: 0;
+  font-size: clamp(0.7rem, 4.2cqi, 0.95rem);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* One grid shared by every row so the columns line up */
+.trip-card__transactions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  column-gap: 1.5ch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.72rem;
+  border-top: 1px solid var(--line-grey);
+}
+
+.transaction {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+  padding: 0.35rem 0.25rem;
+  border-bottom: 1px solid var(--line-grey);
+}
+
+.transaction__company {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.transaction__amount {
+  justify-self: end;
+}
+
+.transaction__time {
+  color: var(--muted-brown);
+}
+
+.trip-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.status-badge svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.status-badge--pending {
+  background: var(--pending);
+  color: var(--brown);
+}
+
+.status-badge--expensed {
+  background: var(--approved);
+  color: #fff;
+}
