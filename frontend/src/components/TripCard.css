@@ -4,15 +4,6 @@
   flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--line);
-  color: inherit;
-  text-decoration: none;
-}
-
-/* Pointer cursor for mouse users only; touch screens get no hover styling */
-@media (hover: hover) and (pointer: fine) {
-  .trip-card {
-    cursor: pointer;
-  }
 }
 
 .trip-card__body {
@@ -20,6 +11,15 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.75rem 0.9rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Pointer cursor for mouse users only; touch screens get no hover styling */
+@media (hover: hover) and (pointer: fine) {
+  .trip-card__body {
+    cursor: pointer;
+  }
 }
 
 /* Header text scales with the card's width so it stays on one line */
@@ -86,13 +86,19 @@
   color: var(--text-muted);
 }
 
-/* Full-width status band along the bottom of the card */
-.trip-card__status {
+/* Full-width status band along the bottom of the card. On the main menu it's
+   a Button, so these override the button's own shape. */
+.trip-card__status,
+.button.trip-card__status {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
+  width: 100%;
+  min-height: 2.5rem;
   padding: 0.6rem;
+  border: 0;
+  border-radius: 0;
   font-size: 0.8rem;
   font-weight: 700;
 }
@@ -102,12 +108,14 @@
   height: 1rem;
 }
 
-.trip-card__status--pending {
+.trip-card__status--pending,
+.button.trip-card__status--pending {
   background: var(--pending);
   color: var(--brown);
 }
 
-.trip-card__status--expensed {
+.trip-card__status--expensed,
+.button.trip-card__status--expensed {
   background: var(--approved);
   color: #fff;
 }

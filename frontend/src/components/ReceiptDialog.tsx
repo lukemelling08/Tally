@@ -1,32 +1,26 @@
-import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useRef } from 'react'
-import { db } from '../db'
 import { useObjectUrl } from '../images'
 import Button from './Button'
 import { CloseIcon } from './icons'
 import './ReceiptDialog.css'
 
 interface ReceiptDialogProps {
-  expenseId: string | null
+  image: Blob | undefined
   title: string
   onClose: () => void
 }
 
-// Full-screen preview of a stored receipt photo; open while expenseId is set
-function ReceiptDialog({ expenseId, title, onClose }: ReceiptDialogProps) {
+// Full-screen preview of a receipt photo; open while image is set
+function ReceiptDialog({ image, title, onClose }: ReceiptDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
-  const receipt = useLiveQuery(
-    () => (expenseId ? db.receipts.get(expenseId) : undefined),
-    [expenseId],
-  )
-  const imageUrl = useObjectUrl(receipt?.image)
+  const imageUrl = useObjectUrl(image)
 
   useEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
-    if (expenseId && !dialog.open) dialog.showModal()
-    if (!expenseId && dialog.open) dialog.close()
-  }, [expenseId])
+    if (image && !dialog.open) dialog.showModal()
+    if (!image && dialog.open) dialog.close()
+  }, [image])
 
   return (
     <dialog
@@ -50,10 +44,8 @@ function ReceiptDialog({ expenseId, title, onClose }: ReceiptDialogProps) {
             onClick={() => dialogRef.current?.close()}
           />
         </div>
-        {imageUrl ? (
+        {imageUrl && (
           <img src={imageUrl} alt={`Receipt for ${title}`} className="receipt-dialog__image" />
-        ) : (
-          <p className="receipt-dialog__empty">Loading receipt…</p>
         )}
       </div>
     </dialog>

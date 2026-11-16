@@ -1,5 +1,6 @@
 import { strToU8, zipSync, type Zippable } from 'fflate'
-import { db, type Expense, type Trip } from './db'
+import { EXTENSIONS } from './bundle'
+import type { Expense, Trip } from './db'
 import { placeCode } from './places'
 
 // 2026-11-03 -> 03/11/2026, which UK spreadsheets read as a date
@@ -20,34 +21,26 @@ const fileSafe = (text: string) =>
     .replace(/^-|-$/g, '')
     .slice(0, 40) || 'receipt'
 
-const EXTENSIONS: Record<string, string> = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/heic': 'heic',
-  'image/webp': 'webp',
-}
-
-// NCL-COV_2026-11-03_to_2026-11-07
+// COV_2026-11-03_to_2026-11-07
 export const exportName = (trip: Trip) =>
-  `${placeCode(trip.from)}-${placeCode(trip.to)}_${trip.start}_to_${trip.end}`
+  `${placeCode(trip.destination)}_${trip.start}_to_${trip.end}`
 
 // A zip holding a CSV of the trip's expenses plus a receipts/ folder of photos
-export async function buildTripExport(trip: Trip, expenses: Expense[]) {
+export async function buildTripExport(trip: Trip, expenses: Expense[], receipts: Map<string, Blob>) {
   const name = exportName(trip)
-  const receipts = await db.receipts.bulkGet(expenses.map((e) => e.id))
   const files: Zippable = {}
 
   const header = ['Date', 'Business', 'Details', 'Recharge (£)', 'Gross (£)', 'Status', 'Receipt']
   const rows = await Promise.all(
     expenses.map(async (expense, i) => {
-      const receipt = receipts[i]
+      const image = receipts.get(expense.id)
       let receiptPath = ''
-      if (receipt) {
-        const ext = EXTENSIONS[receipt.image.type] ?? 'jpg'
+      if (image) {
+        const ext = EXTENSIONS[image.type] ?? 'jpg'
         const number = String(i + 1).padStart(2, '0')
         receiptPath = `receipts/${number}_${expense.purchasedAt}_${fileSafe(expense.company)}.${ext}`
         // Photos are already compressed, so store them as-is
-        files[receiptPath] = [new Uint8Array(await receipt.image.arrayBuffer()), { level: 0 }]
+        files[receiptPath] = [new Uint8Array(await image.arrayBuffer()), { level: 0 }]
       }
       return [
         ukDate(expense.purchasedAt),
@@ -68,6 +61,15 @@ export async function buildTripExport(trip: Trip, expenses: Expense[]) {
   return new File([zipSync(files)], `${name}.zip`, { type: 'application/zip' })
 }
 
+export function downloadFile(file: File) {
+  const url = URL.createObjectURL(file)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = file.name
+  link.click()
+  setTimeout(() => URL.revokeObjectURL(url), 60_000)
+}
+
 // Opens the phone's share sheet (Save to Files, Mail, AirDrop…), or downloads
 // the file where sharing files isn't supported
 export async function shareFile(file: File) {
@@ -79,10 +81,5 @@ export async function shareFile(file: File) {
       if (error instanceof DOMException && error.name === 'AbortError') return
     }
   }
-  const url = URL.createObjectURL(file)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = file.name
-  link.click()
-  setTimeout(() => URL.revokeObjectURL(url), 60_000)
+  downloadFile(file)
 }

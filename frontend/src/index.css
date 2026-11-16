@@ -86,6 +86,11 @@ a {
   outline-offset: 2px;
 }
 
+/* Make the hidden attribute win over components' own display rules */
+[hidden] {
+  display: none !important;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

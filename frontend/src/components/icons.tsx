@@ -93,6 +93,14 @@ export function ShareIcon() {
   )
 }
 
+export function DownloadIcon() {
+  return (
+    <svg {...iconProps}>
+      <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
+    </svg>
+  )
+}
+
 export function ArrowUpIcon() {
   return (
     <svg {...iconProps}>

@@ -1,0 +1,9 @@
+# Cloudflare Pages: static app in dist/, plus functions/ for share links
+name = "tally-expenso"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-11-01"
+
+# Encrypted shared trips. Entries expire after 30 days.
+[[kv_namespaces]]
+binding = "SHARES"
+id = "72b3fd0a6bbc48e9a3aa96e13821ce21"

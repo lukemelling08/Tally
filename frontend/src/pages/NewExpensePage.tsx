@@ -5,7 +5,7 @@ import { CameraIcon, CloseIcon, WarningIcon } from '../components/icons'
 import { addExpense, db, groupByTrip, sortTrips, tripStatus } from '../db'
 import { formatDateRange, formatGBP, todayLocal, toPence } from '../format'
 import { compressImage, useObjectUrl } from '../images'
-import { tripRoute } from '../places'
+import { placeCode } from '../places'
 import { navigate } from '../router'
 import './NewExpensePage.css'
 
@@ -51,7 +51,7 @@ function NewExpensePage() {
       const tripId = await addExpense({
         tripId: creatingTrip ? undefined : selectedTrip,
         newTrip: creatingTrip
-          ? { from: text('from'), to: text('to'), start: text('start'), end: text('end') }
+          ? { destination: text('destination'), start: text('start'), end: text('end') }
           : undefined,
         expense: {
           purchasedAt: text('purchasedAt'),
@@ -89,7 +89,7 @@ function NewExpensePage() {
               <option value={NEW_TRIP}>New trip</option>
               {sortedTrips.map((trip) => (
                 <option key={trip.id} value={trip.id}>
-                  {tripRoute(trip.from, trip.to)} · {formatDateRange(trip.start, trip.end)}
+                  {placeCode(trip.destination)} · {formatDateRange(trip.start, trip.end)}
                 </option>
               ))}
             </select>
@@ -97,19 +97,11 @@ function NewExpensePage() {
 
           {creatingTrip && (
             <>
-              <div className="field-row">
-                <div className="field">
-                  <label className="field__label" htmlFor="from">
-                    From
-                  </label>
-                  <input id="from" name="from" className="input" required />
-                </div>
-                <div className="field">
-                  <label className="field__label" htmlFor="to">
-                    To
-                  </label>
-                  <input id="to" name="to" className="input" required />
-                </div>
+              <div className="field">
+                <label className="field__label" htmlFor="destination">
+                  Destination
+                </label>
+                <input id="destination" name="destination" className="input" required />
               </div>
               <div className="field-row">
                 <div className="field">

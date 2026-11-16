@@ -2,20 +2,27 @@ import Button from './components/Button'
 import { PlusIcon, UserIcon } from './components/icons'
 import NewExpensePage from './pages/NewExpensePage'
 import SettingsPage from './pages/SettingsPage'
+import SharedTripPage from './pages/SharedTripPage'
 import TripOverviewPage from './pages/TripOverviewPage'
 import TripsPage from './pages/TripsPage'
 import { navigate, scrollToTop, usePathname } from './router'
+
+const SHARED_TRIP = /^\/s\/([^/]+)$/
 
 function currentPage(pathname: string) {
   if (pathname === '/settings') return <SettingsPage />
   if (pathname === '/expenses/new') return <NewExpensePage />
   const trip = pathname.match(/^\/trips\/([^/]+)$/)
   if (trip) return <TripOverviewPage tripId={decodeURIComponent(trip[1])} />
+  const shared = pathname.match(SHARED_TRIP)
+  if (shared) return <SharedTripPage shareId={decodeURIComponent(shared[1])} />
   return <TripsPage />
 }
 
 function App() {
   const pathname = usePathname()
+  // Someone viewing a shared trip gets a read-only page, without our actions
+  const viewingShared = SHARED_TRIP.test(pathname)
 
   // Back to the main menu, or to the top of it if already there
   function goHome() {
@@ -33,7 +40,7 @@ function App() {
             aria-label="Tally home"
             onClick={goHome}
           />
-          <div className="top-banner__actions">
+          <div className="top-banner__actions" hidden={viewingShared}>
             <Button
               variant="ghost-inverse"
               icon={<UserIcon />}

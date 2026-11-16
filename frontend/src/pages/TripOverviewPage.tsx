@@ -2,15 +2,16 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
 import Button from '../components/Button'
 import ConfirmDialog from '../components/ConfirmDialog'
+import ExpenseCard from '../components/ExpenseCard'
 import Link from '../components/Link'
 import ReceiptDialog from '../components/ReceiptDialog'
-import { CheckIcon, ClockIcon, ReceiptIcon, ShareIcon, TrashIcon } from '../components/icons'
-import { db, deleteExpense, totalGross, tripStatus, type Expense } from '../db'
-import { buildTripExport, shareFile } from '../export'
-import { formatDateRange, formatDayMonth, formatGBP } from '../format'
+import ShareDialog from '../components/ShareDialog'
+import TripSummary from '../components/TripSummary'
+import { ShareIcon } from '../components/icons'
+import { db, deleteExpense, loadReceipts, type Expense } from '../db'
+import { buildTripExport } from '../export'
+import { formatDayMonth, formatGBP } from '../format'
 import { navigate } from '../router'
-import '../components/TripCard.css'
-import './TripOverviewPage.css'
 
 function TripOverviewPage({ tripId }: { tripId: string }) {
   // null once loaded means the trip doesn't exist
@@ -19,17 +20,22 @@ function TripOverviewPage({ tripId }: { tripId: string }) {
     () => db.expenses.where('tripId').equals(tripId).sortBy('purchasedAt'),
     [tripId],
   )
+  const [receipts, setReceipts] = useState(new Map<string, Blob>())
+  const [exportFile, setExportFile] = useState<File>()
   const [viewing, setViewing] = useState<Expense | null>(null)
   const [deleting, setDeleting] = useState<Expense | null>(null)
-  const [exportFile, setExportFile] = useState<File>()
+  const [sharing, setSharing] = useState(false)
 
-  // Build the zip ahead of time: iOS only opens the share sheet if share() is
-  // called straight from the tap, with no slow work in between
+  // Load the photos and build the zip ahead of time: iOS only opens the share
+  // sheet if share() is called straight from the tap, with no slow work first
   useEffect(() => {
     if (!trip || !expenses?.length) return
     let cancelled = false
-    buildTripExport(trip, expenses).then((file) => {
-      if (!cancelled) setExportFile(file)
+    loadReceipts(expenses.map((e) => e.id)).then(async (loaded) => {
+      const file = await buildTripExport(trip, expenses, loaded)
+      if (cancelled) return
+      setReceipts(loaded)
+      setExportFile(file)
     })
     return () => {
       cancelled = true
@@ -49,9 +55,6 @@ function TripOverviewPage({ tripId }: { tripId: string }) {
     )
   }
 
-  const status = tripStatus(expenses)
-  const deletingLast = expenses.length === 1
-
   async function confirmDelete() {
     if (!deleting) return
     const tripRemoved = await deleteExpense(deleting)
@@ -61,82 +64,39 @@ function TripOverviewPage({ tripId }: { tripId: string }) {
 
   return (
     <main className="content narrow">
-      <header className="trip-overview">
-        <div className="trip-overview__body">
-          <h1 className="trip-overview__title">
-            {trip.from} → {trip.to}
-          </h1>
-          <div className="trip-overview__meta">
-            <span>
-              {formatDateRange(trip.start, trip.end)} · {expenses.length}{' '}
-              {expenses.length === 1 ? 'purchase' : 'purchases'}
-            </span>
-            <span className="trip-overview__total">
-              <span className="visually-hidden">Total </span>
-              {formatGBP(totalGross(expenses))}
-            </span>
-          </div>
-        </div>
-        <div className={`trip-card__status trip-card__status--${status}`}>
-          {status === 'pending' ? <ClockIcon /> : <CheckIcon />}
-          {status === 'pending' ? 'Pending' : 'Expensed'}
-        </div>
-      </header>
+      <TripSummary trip={trip} expenses={expenses} />
 
       <ul className="expense-list">
         {expenses.map((expense) => (
-          <li key={expense.id} className="expense-card">
-            <div className="expense-card__row">
-              <span className="expense-card__company">{expense.company}</span>
-              <span className="expense-card__amount">{formatGBP(expense.gross)}</span>
-            </div>
-            {expense.details && <p className="expense-card__details">{expense.details}</p>}
-            <div className="expense-card__row">
-              <time className="expense-card__time" dateTime={expense.purchasedAt}>
-                {formatDayMonth(expense.purchasedAt)}
-              </time>
-              {expense.hasReceipt ? (
-                <Button
-                  variant="ghost"
-                  size="small"
-                  icon={<ReceiptIcon />}
-                  aria-label={`Receipt for ${expense.company}`}
-                  onClick={() => setViewing(expense)}
-                >
-                  Receipt
-                </Button>
-              ) : (
-                <span className="expense-card__no-receipt">No receipt</span>
-              )}
-            </div>
-            <Button
-              variant="danger"
-              size="small"
-              icon={<TrashIcon />}
-              aria-label={`Delete expense: ${expense.company}`}
-              onClick={() => setDeleting(expense)}
-            >
-              Delete expense
-            </Button>
-          </li>
+          <ExpenseCard
+            key={expense.id}
+            expense={expense}
+            hasReceipt={expense.hasReceipt}
+            onShowReceipt={() => setViewing(expense)}
+            onDelete={() => setDeleting(expense)}
+          />
         ))}
       </ul>
 
       <div className="trip-overview__share">
-        <Button
-          icon={<ShareIcon />}
-          disabled={!exportFile}
-          onClick={() => exportFile && shareFile(exportFile)}
-        >
-          {exportFile ? 'Share' : 'Preparing…'}
+        <Button icon={<ShareIcon />} onClick={() => setSharing(true)}>
+          Share
         </Button>
-        <p className="field__hint">A zip with a spreadsheet of these expenses and every receipt.</p>
       </div>
 
       <ReceiptDialog
-        expenseId={viewing?.id ?? null}
+        image={viewing ? receipts.get(viewing.id) : undefined}
         title={viewing?.company ?? ''}
         onClose={() => setViewing(null)}
+      />
+
+      <ShareDialog
+        open={sharing}
+        trip={trip}
+        expenses={expenses}
+        receipts={receipts}
+        exportFile={exportFile}
+        onClose={() => setSharing(false)}
       />
 
       <ConfirmDialog
@@ -152,7 +112,9 @@ function TripOverviewPage({ tripId }: { tripId: string }) {
               {deleting.company}, {formatGBP(deleting.gross)} on {formatDayMonth(deleting.purchasedAt)}
               {deleting.hasReceipt && ', and its receipt'} will be removed. This can't be undone.
             </p>
-            {deletingLast && <p>It's the only expense on this trip, so the trip will be deleted too.</p>}
+            {expenses.length === 1 && (
+              <p>It's the only expense on this trip, so the trip will be deleted too.</p>
+            )}
           </>
         )}
       </ConfirmDialog>

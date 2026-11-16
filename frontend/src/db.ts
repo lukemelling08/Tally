@@ -7,8 +7,7 @@ export type ExpenseStatus = 'pending' | 'expensed'
 
 export interface Trip {
   id: string
-  from: string
-  to: string
+  destination: string
   start: string // YYYY-MM-DD
   end: string
   createdAt: string
@@ -52,6 +51,20 @@ db.version(1).stores({
   receipts: 'expenseId',
   allowances: 'id, createdAt',
 })
+
+// v2: trips keep only their destination (indexes unchanged)
+db.version(2)
+  .stores({})
+  .upgrade((tx) =>
+  tx
+    .table('trips')
+    .toCollection()
+    .modify((trip) => {
+      trip.destination ??= trip.to ?? ''
+      delete trip.from
+      delete trip.to
+    }),
+)
 
 // randomUUID needs a secure context, which a dev server on the LAN isn't
 export const newId = () =>
@@ -107,6 +120,16 @@ export function addExpense({ newTrip, tripId, expense, receipt }: NewExpense) {
     return id
   })
 }
+
+// Receipt photos for a set of expenses, keyed by expense id
+export async function loadReceipts(expenseIds: string[]) {
+  const found = await db.receipts.bulkGet(expenseIds)
+  return new Map(found.filter((r) => r !== undefined).map((r) => [r.expenseId, r.image]))
+}
+
+// Marks every expense on a trip as pending or expensed
+export const setTripStatus = (tripId: string, status: ExpenseStatus) =>
+  db.expenses.where('tripId').equals(tripId).modify({ status })
 
 // Removes an expense and its receipt, and the trip too if it's now empty.
 // Returns true when the trip was removed.

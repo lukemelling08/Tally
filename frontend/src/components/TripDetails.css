@@ -95,3 +95,8 @@
   gap: 0.5rem;
   padding: 0 0 1.5rem;
 }
+
+.shared-trip__loading {
+  padding: 2rem 0;
+  text-align: center;
+}

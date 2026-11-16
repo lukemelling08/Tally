@@ -37,3 +37,9 @@
   gap: 0.5rem;
   margin-top: 0.25rem;
 }
+
+.share-dialog__options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

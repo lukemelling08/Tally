@@ -42,9 +42,3 @@
   background: var(--bg);
 }
 
-.receipt-dialog__empty {
-  margin: 0;
-  padding: 2rem;
-  text-align: center;
-  color: var(--text-muted);
-}

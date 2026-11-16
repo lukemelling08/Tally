@@ -1,6 +1,7 @@
-import { totalGross, tripStatus, type Expense, type Trip } from '../db'
+import { setTripStatus, totalGross, tripStatus, type Expense, type Trip } from '../db'
 import { formatDateRange, formatDayMonth, formatGBP } from '../format'
-import { tripRoute } from '../places'
+import { placeCode } from '../places'
+import Button from './Button'
 import Link from './Link'
 import { CheckIcon, ClockIcon } from './icons'
 import './TripCard.css'
@@ -10,16 +11,16 @@ const PREVIEW_COUNT = 4
 function TripCard({ trip, expenses }: { trip: Trip; expenses: Expense[] }) {
   const preview = expenses.slice(0, PREVIEW_COUNT)
   const status = tripStatus(expenses)
+  const nextStatus = status === 'pending' ? 'expensed' : 'pending'
 
   return (
-    <Link to={`/trips/${trip.id}`} className="trip-card">
-      <div className="trip-card__body">
+    <article className="trip-card">
+      {/* The card opens the trip; the status band is its own button */}
+      <Link to={`/trips/${trip.id}`} className="trip-card__body">
         <div className="trip-card__header">
           <h2 className="trip-card__route">
-            <span aria-hidden="true">{tripRoute(trip.from, trip.to)}</span>
-            <span className="visually-hidden">
-              {trip.from} to {trip.to}
-            </span>
+            <span aria-hidden="true">{placeCode(trip.destination)}</span>
+            <span className="visually-hidden">{trip.destination}</span>
             <span className="trip-card__dates">
               {' · '}
               {formatDateRange(trip.start, trip.end)}
@@ -42,13 +43,17 @@ function TripCard({ trip, expenses }: { trip: Trip; expenses: Expense[] }) {
             </li>
           ))}
         </ul>
-      </div>
+      </Link>
 
-      <div className={`trip-card__status trip-card__status--${status}`}>
-        {status === 'pending' ? <ClockIcon /> : <CheckIcon />}
+      <Button
+        icon={status === 'pending' ? <ClockIcon /> : <CheckIcon />}
+        className={`trip-card__status trip-card__status--${status}`}
+        aria-label={`${status === 'pending' ? 'Pending' : 'Expensed'}. Mark as ${nextStatus}`}
+        onClick={() => setTripStatus(trip.id, nextStatus)}
+      >
         {status === 'pending' ? 'Pending' : 'Expensed'}
-      </div>
-    </Link>
+      </Button>
+    </article>
   )
 }
 

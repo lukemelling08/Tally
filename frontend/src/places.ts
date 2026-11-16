@@ -79,6 +79,3 @@ export function placeCode(name: string) {
       : letters.slice(0, 3)
   return code.toUpperCase()
 }
-
-// "NCL → COV"
-export const tripRoute = (from: string, to: string) => `${placeCode(from)} → ${placeCode(to)}`

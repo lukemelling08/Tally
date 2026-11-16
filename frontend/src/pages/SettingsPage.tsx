@@ -1,9 +1,12 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import Button from '../components/Button'
-import { PlusIcon, TrashIcon } from '../components/icons'
+import ConfirmDialog from '../components/ConfirmDialog'
+import { DownloadIcon, PlusIcon, TrashIcon, WarningIcon } from '../components/icons'
 import { db, newId } from '../db'
+import { downloadFile } from '../export'
 import { formatGBP, toPence } from '../format'
+import { applySync, buildSyncFile, readSyncFile, type SyncContents } from '../sync'
 import { getThemePreference, setThemePreference, type ThemePreference } from '../theme'
 import './SettingsPage.css'
 
@@ -16,6 +19,49 @@ const STYLE_OPTIONS: { value: ThemePreference; label: string; hint: string }[] =
 function SettingsPage() {
   const [theme, setTheme] = useState(getThemePreference)
   const allowances = useLiveQuery(() => db.allowances.orderBy('createdAt').toArray())
+  const [syncFile, setSyncFile] = useState<File>()
+  const [incoming, setIncoming] = useState<SyncContents | null>(null)
+  const [syncMessage, setSyncMessage] = useState<{ text: string; error?: boolean }>()
+  const [lastSync, setLastSync] = useState(0)
+  const syncInput = useRef<HTMLInputElement>(null)
+
+  // Built ahead of time so the share sheet opens straight from the tap (iOS
+  // requires that). Rebuilt when allowances change here or after receiving.
+  useEffect(() => {
+    let cancelled = false
+    buildSyncFile().then((file) => {
+      if (!cancelled) setSyncFile(file)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [allowances, lastSync])
+
+  async function chooseSyncFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    try {
+      setIncoming(await readSyncFile(file))
+      setSyncMessage(undefined)
+    } catch (error) {
+      setSyncMessage({ text: (error as Error).message, error: true })
+    }
+  }
+
+  async function confirmSync() {
+    if (!incoming) return
+    const { trips, expenses } = incoming.data
+    try {
+      await applySync(incoming)
+      setSyncMessage({ text: `Loaded ${trips.length} trips and ${expenses.length} expenses.` })
+      setLastSync(Date.now())
+    } catch (error) {
+      console.error(error)
+      setSyncMessage({ text: "Couldn't load the data. Nothing on this device was changed.", error: true })
+    }
+    setIncoming(null)
+  }
 
   function chooseTheme(value: ThemePreference) {
     setTheme(value)
@@ -115,6 +161,56 @@ function SettingsPage() {
           </Button>
         </form>
       </section>
+
+      <section className="settings-group" aria-labelledby="sync-heading">
+        <h2 id="sync-heading" className="section-label">
+          Data
+        </h2>
+        <div className="sync-panel">
+          <Button
+            icon={<DownloadIcon />}
+            disabled={!syncFile}
+            onClick={() => syncFile && downloadFile(syncFile)}
+          >
+            Download data
+          </Button>
+          <input
+            ref={syncInput}
+            type="file"
+            accept=".zip,application/zip"
+            className="visually-hidden"
+            tabIndex={-1}
+            aria-hidden="true"
+            onChange={chooseSyncFile}
+          />
+          <Button variant="ghost" onClick={() => syncInput.current?.click()}>
+            Load data
+          </Button>
+
+          {syncMessage && (
+            <p className={syncMessage.error ? 'field-warning' : 'field__hint'} role="status">
+              {syncMessage.error && <WarningIcon />}
+              <span>{syncMessage.text}</span>
+            </p>
+          )}
+        </div>
+      </section>
+
+      <ConfirmDialog
+        open={incoming !== null}
+        title="Replace this phone's data?"
+        confirmLabel="Replace"
+        onConfirm={confirmSync}
+        onCancel={() => setIncoming(null)}
+      >
+        {incoming && (
+          <p>
+            Everything on this phone will be replaced with {incoming.data.trips.length} trips,{' '}
+            {incoming.data.expenses.length} expenses and {incoming.data.allowances.length}{' '}
+            allowances from the file. This can't be undone.
+          </p>
+        )}
+      </ConfirmDialog>
     </main>
   )
 }

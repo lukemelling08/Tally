@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useEffect, useState } from 'react'
 import logo from '../assets/tally-logo.svg'
 import logoOnDark from '../assets/tally-logo-on-dark.svg'
 import Button from '../components/Button'
@@ -8,7 +9,27 @@ import { db, groupByTrip, sortTrips, totalGross } from '../db'
 import { formatGBP } from '../format'
 import { scrollToTop } from '../router'
 
+// True when the page is taller than the screen, i.e. there's something to scroll
+function usePageScrolls() {
+  const [scrolls, setScrolls] = useState(false)
+
+  useEffect(() => {
+    const check = () => setScrolls(document.documentElement.scrollHeight > window.innerHeight)
+    // Fires once on observe, then whenever the page's height changes
+    const observer = new ResizeObserver(check)
+    observer.observe(document.body)
+    window.addEventListener('resize', check)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', check)
+    }
+  }, [])
+
+  return scrolls
+}
+
 function TripsPage() {
+  const pageScrolls = usePageScrolls()
   const trips = useLiveQuery(() => db.trips.toArray())
   const expenses = useLiveQuery(() => db.expenses.toArray())
 
@@ -50,11 +71,13 @@ function TripsPage() {
             ))}
           </ul>
 
-          <div className="scroll-top">
-            <Button icon={<ArrowUpIcon />} onClick={scrollToTop}>
-              Scroll to top
-            </Button>
-          </div>
+          {pageScrolls && (
+            <div className="scroll-top">
+              <Button icon={<ArrowUpIcon />} onClick={scrollToTop}>
+                Scroll to top
+              </Button>
+            </div>
+          )}
         </>
       )}
     </main>

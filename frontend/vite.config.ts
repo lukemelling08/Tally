@@ -12,6 +12,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // Share links' API always goes to the network
+        navigateFallbackDenylist: [/^\/api\//],
       },
       manifest: {
         name: 'Tally',
